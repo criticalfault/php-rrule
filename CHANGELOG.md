@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-n/a
+### Fixed
+
+- Fix typo in NL translation [#53](https://github.com/rlanvin/php-rrule/issues/53)
 
 ## [1.6.1] - 2018-04-13
 
