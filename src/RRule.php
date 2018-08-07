@@ -997,52 +997,52 @@ class RRule implements RRuleInterface
 // Note: if cache is complete, we could probably avoid completely calling iterate()
 // and instead iterate directly on the $this->cache array
 
-	/** @internal */
-	protected $current = 0;
-	/** @internal */
-	protected $key = 0;
+	// /** @internal */
+	// protected $current = 0;
+	// /** @internal */
+	// protected $key = 0;
 
-	/**
-	 * @internal
-	 */
-	public function rewind()
-	{
-		$this->current = $this->iterate(true);
-		$this->key = 0;
-	}
+	// /**
+	//  * @internal
+	//  */
+	// public function rewind()
+	// {
+	// 	$this->current = $this->iterate(true);
+	// 	$this->key = 0;
+	// }
 
-	/**
-	 * @internal
-	 */
-	public function current()
-	{
-		return $this->current;
-	}
+	// /**
+	//  * @internal
+	//  */
+	// public function current()
+	// {
+	// 	return $this->current;
+	// }
 
-	/**
-	 * @internal
-	 */
-	public function key()
-	{
-		return $this->key;
-	}
+	// /**
+	//  * @internal
+	//  */
+	// public function key()
+	// {
+	// 	return $this->key;
+	// }
 
-	/**
-	 * @internal
-	 */
-	public function next()
-	{
-		$this->current = $this->iterate();
-		$this->key += 1;
-	}
+	// /**
+	//  * @internal
+	//  */
+	// public function next()
+	// {
+	// 	$this->current = $this->iterate();
+	// 	$this->key += 1;
+	// }
 
-	/**
-	 * @internal
-	 */
-	public function valid()
-	{
-		return $this->current !== null;
-	}
+	// /**
+	//  * @internal
+	//  */
+	// public function valid()
+	// {
+	// 	return $this->current !== null;
+	// }
 
 ///////////////////////////////////////////////////////////////////////////////
 // ArrayAccess interface
@@ -1458,30 +1458,30 @@ class RRule implements RRuleInterface
 	// DO NOT USE OUTSIDE OF iterate()
 
 	/** @internal */
-	private $_year = null;
-	/** @internal */
-	private $_month = null;
-	/** @internal */
-	private $_day = null;
-	/** @internal */
-	private $_hour = null;
-	/** @internal */
-	private $_minute = null;
-	/** @internal */
-	private $_second = null;
+	// private $_year = null;
+	// /** @internal */
+	// private $_month = null;
+	// /** @internal */
+	// private $_day = null;
+	// /** @internal */
+	// private $_hour = null;
+	// /** @internal */
+	// private $_minute = null;
+	// /** @internal */
+	// private $_second = null;
 
-	/** @internal */
-	private $_dayset = null;
-	/** @internal */
-	private $_masks = null;
-	/** @internal */
-	private $_timeset = null;
-	/** @internal */
-	private $_dtstart = null;
-	/** @internal */
-	private $_total = 0;
-	/** @internal */
-	private $_use_cache = true;
+	// * @internal 
+	// private $_dayset = null;
+	// /** @internal */
+	// private $_masks = null;
+	// /** @internal */
+	// private $_timeset = null;
+	// /** @internal */
+	// private $_dtstart = null;
+	// /** @internal */
+	// private $_total = 0;
+	// /** @internal */
+	// private $_use_cache = true;
 
 	/**
 	 * This is the main method, where all of the magic happens.
@@ -1531,74 +1531,44 @@ class RRule implements RRuleInterface
 	 * @param $reset (bool) Whether to restart the iteration, or keep going
 	 * @return \DateTime|null
 	 */
-	protected function iterate($reset = false)
+	// protected function iterate($reset = false)
+	public function getIterator()
 	{
-		// for readability's sake, and because scope of the variables should be local anyway
-		$year = & $this->_year;
-		$month = & $this->_month;
-		$day = & $this->_day;
-		$hour = & $this->_hour;
-		$minute = & $this->_minute;
-		$second = & $this->_second;
-		$dayset = & $this->_dayset;
-		$masks = & $this->_masks;
-		$timeset = & $this->_timeset;
-		$dtstart = & $this->_dtstart;
-		$total = & $this->_total;
-		$use_cache = & $this->_use_cache;
-
-		if ( $reset ) {
-			$this->_year = $this->_month = $this->_day = null;
-			$this->_hour = $this->_minute = $this->_second = null;
-			$this->_dayset = $this->_masks = $this->_timeset = null;
-			$this->_dtstart = null;
-			$this->_total = 0;
-			$this->_use_cache = true;
-			reset($this->cache);
-		}
+		$total = 0;
+		$occurrence = null;
+		$dtstart = null;
+		$dayset = null;
 
 		// go through the cache first
-		if ( $use_cache ) {
-			while ( ($occurrence = current($this->cache)) !== false ) {
-				// echo "Cache hit\n";
-				$dtstart = $occurrence;
-				next($this->cache);
-				$total += 1;
-				return clone $occurrence; // since DateTime is not immutable, avoid any problem
-			}
-			reset($this->cache);
-			// now set use_cache to false to skip the all thing on next iteration
-			// and start filling the cache instead
-			$use_cache = false;
-			// if the cache as been used up completely and we now there is nothing else
-			if ( $total === $this->total ) {
-				// echo "Cache used up, nothing else to compute\n";
-				return null;
-			}
-			// echo "Cache used up with occurrences remaining\n";
-			if ( $dtstart ) {
-				$dtstart = clone $dtstart; // since DateTime is not immutable, avoid any problem
-				// so we skip the last occurrence of the cache
-				if ( $this->freq === self::SECONDLY ) {
-					$dtstart->modify('+'.$this->interval.'second');
-				}
-				else {
-					$dtstart->modify('+1second');
-				}
-			}
+		foreach ( $this->cache as $occurrence ) {
+			yield clone $occurrence; // since DateTime is not immutable, avoid any problem
+
+			$total += 1;
 		}
 
-		// stop once $total has reached COUNT
-		if ( $this->count && $total >= $this->count ) {
-			$this->total = $total;
-			return null;
+		// if the cache as been used up completely and we now there is nothing else,
+		// we can stop the generator
+		if ( $total === $this->total ) {
+			return null; // end generator
+		}
+
+		if ( $occurrence ) {
+			$dtstart = clone $occurrence; // since DateTime is not immutable, clone to avoid any problem
+			// so we skip the last occurrence of the cache
+			if ( $this->freq === self::SECONDLY ) {
+				$dtstart->modify('+'.$this->interval.'second');
+			}
+			else {
+				$dtstart->modify('+1second');
+			}
 		}
 
 		if ( $dtstart === null ) {
 			$dtstart = clone $this->dtstart;
 		}
 
-		if ( $year === null ) {
+		// TODO move at the end of the loop
+		// if ( $year === null ) {
 			if ( $this->freq === self::WEEKLY ) {
 				// we align the start date to the WKST, so we can then
 				// simply loop by adding +7 days. The Python lib does some
@@ -1615,10 +1585,11 @@ class RRule implements RRuleInterface
 			// remove leading zeros
 			$minute = (int) $minute;
 			$second = (int) $second;
-		}
+		// }
+		// END TODO
 
 		// we initialize the timeset
-		if ( $timeset == null ) {
+		// if ( $timeset == null ) {
 			if ( $this->freq < self::HOURLY ) {
 				// daily, weekly, monthly or yearly
 				// we don't need to calculate a new timeset
@@ -1637,9 +1608,8 @@ class RRule implements RRuleInterface
 					$timeset = $this->getTimeSet($hour, $minute, $second);
 				}
 			}
-		}
+		// }
 
-		// while (true) {
 		$max_cycles = self::$REPEAT_CYCLES[$this->freq <= self::DAILY ? $this->freq : self::DAILY];
 		for ( $i = 0; $i < $max_cycles; $i++ ) {
 			// 1. get an array of all days in the next interval (day, month, week, etc.)
@@ -1687,7 +1657,7 @@ class RRule implements RRuleInterface
 
 				$filtered_set = array();
 
-				// filter out the days based on the BY*** rules
+				// filter out the days based on the BYXXX rules
 				foreach ( $dayset as $yearday ) {
 					if ( $this->bymonth && ! in_array($masks['yearday_to_month'][$yearday], $this->bymonth) ) {
 						continue;
@@ -1729,6 +1699,8 @@ class RRule implements RRuleInterface
 
 				// if BYSETPOS is set, we need to expand the timeset to filter by pos
 				// so we make a special loop to return while generating
+				// TODO this is not needed with a generator anymore
+				// we can yield directly within the loop
 				if ( $this->bysetpos && $timeset ) {
 					$filtered_set = array();
 					foreach ( $this->bysetpos as $pos ) {
@@ -1767,32 +1739,38 @@ class RRule implements RRuleInterface
 			// at the same time, we check the end condition and return null if
 			// we need to stop
 			if ( $this->bysetpos && $timeset ) {
-				while ( ($occurrence = current($dayset)) !== false ) {
-
+				// while ( ($occurrence = current($dayset)) !== false ) {
+				foreach ( $dayset as $occurrence ) {
 					// consider end conditions
 					if ( $this->until && $occurrence > $this->until ) {
 						$this->total = $total; // save total for count() cache
 						return null;
 					}
 
-					next($dayset);
+					// next($dayset);
 					if ( $occurrence >= $dtstart ) { // ignore occurrences before DTSTART
+						if ( $this->count && $total >= $this->count ) {
+							$this->total = $total;
+							return null;
+						}
 						$total += 1;
-						$this->cache[] = $occurrence;
-						return clone $occurrence; // yield
+						$this->cache[] = clone $occurrence;
+						yield clone $occurrence; // yield
 					}
 				}
 			}
 			else {
 				// normal loop, without BYSETPOS
-				while ( ($yearday = current($dayset)) !== false ) {
+				// while ( ($yearday = current($dayset)) !== false ) {
+				foreach ( $dayset as $yearday ) {
 					$occurrence = \DateTime::createFromFormat(
 						'Y z',
 						"$year $yearday",
 						$this->dtstart->getTimezone()
 					);
 
-					while ( ($time = current($timeset)) !== false ) {
+					// while ( ($time = current($timeset)) !== false ) {
+					foreach ( $timeset as $time ) {
 						$occurrence->setTime($time[0], $time[1], $time[2]);
 						// consider end conditions
 						if ( $this->until && $occurrence > $this->until ) {
@@ -1800,15 +1778,19 @@ class RRule implements RRuleInterface
 							return null;
 						}
 
-						next($timeset);
+						// next($timeset);
 						if ( $occurrence >= $dtstart ) { // ignore occurrences before DTSTART
+							if ( $this->count && $total >= $this->count ) {
+								$this->total = $total;
+								return null;
+							}
 							$total += 1;
-							$this->cache[] = $occurrence;
-							return clone $occurrence; // yield
+							$this->cache[] = clone $occurrence;
+							yield clone $occurrence; // yield
 						}
 					}
-					reset($timeset);
-					next($dayset);
+					// reset($timeset);
+					// next($dayset);
 				}
 			}
 
