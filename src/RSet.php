@@ -731,6 +731,6 @@ class RSet implements RRuleInterface
 		}
 
 		$this->total = $total; // save total for count cache
-		return null; // stop the iterator
+		return; // stop the iterator
 	}
 }

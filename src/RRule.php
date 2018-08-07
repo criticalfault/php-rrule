@@ -1549,7 +1549,7 @@ class RRule implements RRuleInterface
 		// if the cache as been used up completely and we now there is nothing else,
 		// we can stop the generator
 		if ( $total === $this->total ) {
-			return null; // end generator
+			return; // end generator
 		}
 
 		if ( $occurrence ) {
@@ -1744,14 +1744,14 @@ class RRule implements RRuleInterface
 					// consider end conditions
 					if ( $this->until && $occurrence > $this->until ) {
 						$this->total = $total; // save total for count() cache
-						return null;
+						return;
 					}
 
 					// next($dayset);
 					if ( $occurrence >= $dtstart ) { // ignore occurrences before DTSTART
 						if ( $this->count && $total >= $this->count ) {
 							$this->total = $total;
-							return null;
+							return;
 						}
 						$total += 1;
 						$this->cache[] = clone $occurrence;
@@ -1775,14 +1775,14 @@ class RRule implements RRuleInterface
 						// consider end conditions
 						if ( $this->until && $occurrence > $this->until ) {
 							$this->total = $total; // save total for count() cache
-							return null;
+							return;
 						}
 
 						// next($timeset);
 						if ( $occurrence >= $dtstart ) { // ignore occurrences before DTSTART
 							if ( $this->count && $total >= $this->count ) {
 								$this->total = $total;
-								return null;
+								return;
 							}
 							$total += 1;
 							$this->cache[] = clone $occurrence;
@@ -1858,7 +1858,7 @@ class RRule implements RRuleInterface
 
 					if ( ! $found ) {
 						$this->total = $total; // save total for count cache
-						return null; // stop the iterator
+						return; // stop the iterator
 					}
 
 					$timeset = $this->getTimeSet($hour, $minute, $second);
@@ -1892,7 +1892,7 @@ class RRule implements RRuleInterface
 
 					if ( ! $found ) {
 						$this->total = $total; // save total for count cache
-						return null; // stop the iterator
+						return; // stop the iterator
 					}
 
 					$timeset = $this->getTimeSet($hour, $minute, $second);
@@ -1933,7 +1933,7 @@ class RRule implements RRuleInterface
 
 					if ( ! $found ) {
 						$this->total = $total; // save total for count cache
-						return null; // stop the iterator
+						return; // stop the iterator
 					}
 
 					$timeset = $this->getTimeSet($hour, $minute, $second);
@@ -1947,7 +1947,7 @@ class RRule implements RRuleInterface
 		}
 
 		$this->total = $total; // save total for count cache
-		return null; // stop the iterator
+		return; // stop the iterator
 	}
 
 ///////////////////////////////////////////////////////////////////////////////
